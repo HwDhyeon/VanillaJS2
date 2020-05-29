@@ -17,6 +17,18 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.fillStyle = INITIAL_COLOR;
 ctx.strokeStyle = INITIAL_COLOR;
 ctx.lineWidth = 2.5;
+handleRangeChange({
+  target: {
+    value: 2.5,
+  },
+});
+handleColorClick({
+  target: {
+    style: {
+      backgroundColor: "rgb(44, 44, 44)",
+    },
+  },
+});
 
 let painting = false;
 let filling = false;
@@ -45,13 +57,31 @@ function onMouseDown(event) {
   painting = true;
 }
 
+function rgbaToHex(orig) {
+  var rgb = orig
+      .replace(/\s/g, "")
+      .match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+    hex = rgb
+      ? (rgb[1] | (1 << 8)).toString(16).slice(1) +
+        (rgb[2] | (1 << 8)).toString(16).slice(1) +
+        (rgb[3] | (1 << 8)).toString(16).slice(1)
+      : orig;
+  hex = hex;
+
+  return "#" + hex.toUpperCase();
+}
+
 function handleColorClick(event) {
   const color = event.target.style.backgroundColor;
+  let span = document.getElementById("speech");
+  span.innerText = "Current color " + rgbaToHex(color);
   ctx.fillStyle = color;
   ctx.strokeStyle = color;
 }
 
 function handleRangeChange(event) {
+  let rangeValue = document.getElementById("jsRangeValue");
+  rangeValue.value = event.target.value;
   ctx.lineWidth = event.target.value;
 }
 
@@ -92,9 +122,9 @@ if (canvas) {
   canvas.addEventListener("contextmenu", handleCM);
 }
 
-Array.from(colors).forEach((color) =>
-  color.addEventListener("click", handleColorClick)
-);
+Array.from(colors).forEach((color) => {
+  color.addEventListener("click", handleColorClick);
+});
 
 if (range) {
   range.addEventListener("input", handleRangeChange);
